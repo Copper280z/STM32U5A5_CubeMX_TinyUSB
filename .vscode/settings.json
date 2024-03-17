@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "usb_otg.h": "c",
+        "main.h": "c",
+        "stm32u5xx_hal_def.h": "c"
+    }
+}

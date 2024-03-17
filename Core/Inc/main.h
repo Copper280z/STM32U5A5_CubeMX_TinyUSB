@@ -27,6 +27,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "stm32u5a5xx.h"
 #include "stm32u5xx_hal.h"
 
 #include "stm32u5xx_ll_ucpd.h"
