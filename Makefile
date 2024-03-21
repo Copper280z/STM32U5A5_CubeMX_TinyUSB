@@ -20,9 +20,9 @@ TARGET = u5a5_tinyusb
 # building variables
 ######################################
 # debug build?
-DEBUG = 1
+DEBUG = 0
 # optimization
-OPT = -Og
+OPT = -O3
 
 
 #######################################
@@ -86,6 +86,7 @@ Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_uart_ex.c \
 Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_pcd.c \
 Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_pcd_ex.c \
 Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_ll_usb.c \
+Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_dcache.c \
 Core/Src/system_stm32u5xx.c
 
 $(info $(C_SOURCES))
@@ -138,8 +139,7 @@ AS_DEFS =
 C_DEFS =  \
 -DUSE_FULL_LL_DRIVER \
 -DUSE_HAL_DRIVER \
--DSTM32U5A5xx
-
+-DSTM32U5A5xx 
 
 # AS includes
 AS_INCLUDES = 
@@ -168,7 +168,9 @@ $(info $(C_INCLUDES))
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
 
 CFLAGS += $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections \
-		  -DCFG_TUSB_MCU=OPT_MCU_STM32U5
+		  -DCFG_TUSB_MCU=OPT_MCU_STM32U5 \
+		  -DCFG_TUD_MAX_SPEED=OPT_MODE_HIGH_SPEED
+
  
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2

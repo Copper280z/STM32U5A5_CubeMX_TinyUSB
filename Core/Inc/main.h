@@ -40,6 +40,8 @@ extern "C" {
 #include "stm32u5xx_ll_gpio.h"
 #include "stm32u5xx_ll_dma.h"
 
+// #include "stm32u5xx_hal_dcache.h"
+
 #include "stm32u5xx_ll_exti.h"
 #include "tusb.h"
 #include "class/cdc/cdc_device.h"

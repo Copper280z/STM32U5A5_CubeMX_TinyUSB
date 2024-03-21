@@ -60,7 +60,10 @@ static void cdc_task(void);
 /* USER CODE BEGIN PV */
 
 static uint32_t blink_interval_ms = BLINK_NOT_MOUNTED;
+uint32_t count = 1000000; 
+uint32_t prior_count, prior_msec, count_per_second;
 
+// DCACHE_HandleTypeDef *hdcache;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -72,9 +75,6 @@ static void SystemPower_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void OTG_FS_IRQHandler(void) {
-  tud_int_handler(0);
-}
 
 void OTG_HS_IRQHandler(void) {
   tud_int_handler(0);
@@ -116,6 +116,8 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC1_Init();
   MX_ICACHE_Init();
+  // HAL_DCACHE_Init(hdcache);
+  // HAL_DCACHE_Enable(hdcache);
   MX_UCPD1_Init();
   MX_USART1_UART_Init();
   HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, LED_STATE_ON);
@@ -332,23 +334,54 @@ void tud_umount_cb(void) {
 //--------------------------------------------------------------------+
 // USB CDC
 //--------------------------------------------------------------------+
+// static void cdc_task(void) {
+//   uint8_t itf;
+
+//   for (itf = 0; itf < CFG_TUD_CDC; itf++) {
+//     // connected() check for DTR bit
+//     // Most but not all terminal client set this when making connection
+//     // if ( tud_cdc_n_connected(itf) )
+//     {
+//       if (tud_cdc_n_available(itf)) {
+//         uint8_t buf[64];
+
+//         uint32_t count = tud_cdc_n_read(itf, buf, sizeof(buf));
+
+//         // echo back to both serial ports
+        // echo_serial_port(0, buf, count);
+//         echo_serial_port(1, buf, count);
+//       }
+//     }
+//   }
+// }
+
 static void cdc_task(void) {
   uint8_t itf;
 
-  for (itf = 0; itf < CFG_TUD_CDC; itf++) {
+  // for (itf = 0; itf < CFG_TUD_CDC; itf++) 
+  {
     // connected() check for DTR bit
     // Most but not all terminal client set this when making connection
-    // if ( tud_cdc_n_connected(itf) )
+    if ( tud_cdc_n_connected(0) )
     {
-      if (tud_cdc_n_available(itf)) {
         uint8_t buf[64];
 
-        uint32_t count = tud_cdc_n_read(itf, buf, sizeof(buf));
-
-        // echo back to both serial ports
-        echo_serial_port(0, buf, count);
-        echo_serial_port(1, buf, count);
-      }
+        count+=1;
+        uint32_t msec = HAL_GetTick();
+        // uint32_t count = tud_cdc_n_read(itf, buf, sizeof(buf));
+        // uint32_t sz = sprintf(buf, "count=%u, lines/sec=%u\n", count, count_per_second);
+        tud_cdc_write_str("count=");
+        tud_cdc_write_str(itoa(count,buf,10));
+        tud_cdc_write_str(", lines/sec=");
+        tud_cdc_write_str(itoa(count_per_second,buf,10));
+        tud_cdc_write_str("\n");
+        // tud_cdc_write_flush();
+        if (msec - prior_msec >1000) {
+          prior_msec += 1000;
+          count_per_second = count-prior_count;
+          prior_count = count;
+        }
+      
     }
   }
 }
